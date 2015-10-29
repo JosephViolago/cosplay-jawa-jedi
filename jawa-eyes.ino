@@ -1,6 +1,11 @@
-// fades all pixels subtly
-// code by Tony Sherwood for Adafruit Industries
-// https://learn.adafruit.com/mystical-led-halloween-hood
+//fades all pixels subtly
+//code by Tony Sherwood for Adafruit Industries
+
+// https://learn.adafruit.com/mystical-led-halloween-hood?view=all
+// https://github.com/adafruit/Adafruit_NeoPixel
+// https://forums.adafruit.com/viewtopic.php?f=47&t=41143&sid=eef7fdae0160d3855b3d3557a698be1a&start=15#p257897
+
+// https://learn.adafruit.com/adafruit-neopixel-uberguide?view=all
 
 #include <Adafruit_NeoPixel.h>
 
@@ -15,49 +20,32 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(14, PIN, NEO_GRB + NEO_KHZ800);
 
-int alpha; // Current value of the pixels
-int dir = 0; // Direction of the pixels... 1 = getting brighter, 0 = getting dimmer
-int flip; // Randomly flip the direction every once in a while
-int minAlpha = 100; // Min value of brightness
-int maxAlpha = 100; // Max value of brightness
-int alphaDelta = 0; // Delta of brightness between times through the loop
-
 void setup() {
-  strip.begin();
-  strip.show(); // Initialize all pixels to 'off'
+    strip.begin();
+    strip.show(); // Initialize all pixels to 'off'
 }
 
 void loop() {
-  // Some example procedures showing how to display to the pixels:
-  if (dir == 1) {
-    alpha += alphaDelta;
-  }
-  if (dir == 0) {
-    alpha -= alphaDelta;
-  }
-  if (alpha < minAlpha) {
-    alpha = minAlpha;
-    dir = 1;
-  }
-  if (alpha > maxAlpha) {
-    alpha = maxAlpha;
-    dir = 0;
-  }
-  // Change the line below to alter the color of the lights
-  // The numbers represent the Red, Green, and Blue values
-  // of the lights, as a value between 0(off) and 1(max brightness)
-  //
-  // EX:
-  // colorSet(strip.Color(alpha, 0, alpha/2)); // Pink
-  // colorSet(strip.Color(0, 0, alpha)); // Blue
-  colorSet(strip.Color(alpha, alpha/2, 0)); // Yellow
-  // colorSet(strip.Color(alpha, 0, 0)); // Red
-}
+    // Written by: Jason Yandell
 
-// Fill the dots one after the other with a color
-void colorSet(uint32_t c) {
-  for(uint16_t i=0; i<strip.numPixels(); i++) {
-      strip.setPixelColor(i, c);
-      strip.show();
-  }
+    int   TOTAL_LEDS        = 14;
+    float MaximumBrightness = 100;
+    float SpeedFactor       = 0.007;
+    float StepDelay         = 10; // ms for a step delay on the lights
+
+    // Make the lights breathe
+    for (int i = 0; i < 65535; i++) {
+        // Intensity will go from 10 - MaximumBrightness in a "breathing" manner
+        float intensity = MaximumBrightness / 2.0 * (1.5 + sin(SpeedFactor * i));
+        strip.setBrightness(intensity);
+
+        // Now set every LED to that color
+        for (int ledNumber = 0; ledNumber < TOTAL_LEDS; ledNumber++) {
+            strip.setPixelColor(ledNumber, 100, 50, 0);
+        }
+
+        strip.show();
+        // Wait a bit before continuing to breathe
+        delay(StepDelay);
+    }
 }
